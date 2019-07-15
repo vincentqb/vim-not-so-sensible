@@ -2,6 +2,9 @@
 " Maintainer:   Tim Pope <http://tpo.pe/>
 " Version:      1.2
 
+" Load default Vim8 configuration
+source $VIMRUNTIME/defaults.vim
+
 if exists('g:loaded_sensible') || &compatible
   finish
 else
@@ -22,6 +25,12 @@ set backspace=indent,eol,start
 set complete-=i
 set smarttab
 
+" Fold using indentation
+au FileType python set foldmethod=indent
+au FileType python set foldnestmax=1
+" Open/close folds with space
+au FileType python nnoremap <space> za
+
 set nrformats-=octal
 
 if !has('nvim') && &ttimeoutlen == -1
@@ -30,6 +39,7 @@ if !has('nvim') && &ttimeoutlen == -1
 endif
 
 set incsearch
+set hlsearch
 " Use <C-L> to clear the highlighting of :set hlsearch.
 if maparg('<C-L>', 'n') ==# ''
   nnoremap <silent> <C-L> :nohlsearch<C-R>=has('diff')?'<Bar>diffupdate':''<CR><CR><C-L>
@@ -93,3 +103,19 @@ endif
 inoremap <C-U> <C-G>u<C-U>
 
 " vim:set ft=vim et sw=2:
+
+" Automatically turn on/off paste mode when pasting to avoid stacking indentation
+
+let &t_SI .= "\<Esc>[?2004h"
+let &t_EI .= "\<Esc>[?2004l"
+
+let &t_SI .= "\<Esc>[?2004h"
+let &t_EI .= "\<Esc>[?2004l"
+
+inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
+
+function! XTermPasteBegin()
+        set pastetoggle=<Esc>[201~
+        set paste
+        return ""
+endfunction
